@@ -3,6 +3,7 @@ from typing import Tuple
 
 import numpy as np
 import pandas as pd
+from imblearn.under_sampling import EditedNearestNeighbours
 from loguru import logger
 from omegaconf import DictConfig, OmegaConf
 
@@ -22,15 +23,33 @@ class EnsembleTreeTrainer(BaseTrainer):
         self.hyperparams = OmegaConf.to_container(hyperparams, resolve=True)
         self.best_model = None
 
-    def train(self) -> Tuple[np.ndarray, np.ndarray]:
-        """Train the ensemble tree model."""
+    def train(self, enn: bool = False) -> Tuple[np.ndarray, np.ndarray]:
+        """Train the ensemble tree model.
+
+        Parameters
+        ----------
+        enn : bool, optional
+            Whether to apply Edited Nearest Neighbours resampling to training data, by default False
+        """
         # Pick the first fold from k-fold indices
         train_idx, val_idx = self.k_fold_indices[0]
         logger.info(
             f"Size of training set: {len(train_idx)}, validation set: {len(val_idx)}"
         )
 
-        train_pool = Pool(data=self.X[train_idx], label=self.y[train_idx])
+        X_train, y_train = self.X[train_idx], self.y[train_idx]
+
+        if enn:
+            logger.info(
+                "Applying Edited Nearest Neighbours resampling to training data"
+            )
+            resampler = EditedNearestNeighbours()
+            X_train, y_train = resampler.fit_resample(X_train, y_train)
+            logger.info(
+                f"Resampled training data shape: {X_train.shape}, {y_train.shape}"
+            )
+
+        train_pool = Pool(data=X_train, label=y_train)
         val_pool = Pool(data=self.X[val_idx], label=self.y[val_idx])
 
         model = EnsembleTreeClassifier(**self.hyperparams)
@@ -40,15 +59,34 @@ class EnsembleTreeTrainer(BaseTrainer):
 
         return self.y[val_idx], y_preds
 
-    def cross_validate(self):
-        """Train the ensemble tree model with cross validation."""
+    def cross_validate(self, enn: bool = False) -> pd.DataFrame:
+        """Train the ensemble tree model with cross validation.
+
+        Parameters
+        ----------
+        enn : bool, optional
+            Whether to apply Edited Nearest Neighbours resampling to training data in each fold, by default False
+        """
         best_f1_score = 0.0
         best_cv_metrics = None
 
+        cv_results = []
         for i, (train_idx, val_idx) in enumerate(self.k_fold_indices):
             logger.info(f"Training fold {i + 1}/{len(self.k_fold_indices)}")
 
-            train_pool = Pool(data=self.X[train_idx], label=self.y[train_idx])
+            X_train, y_train = self.X[train_idx], self.y[train_idx]
+
+            if enn:
+                logger.info(
+                    "Applying Edited Nearest Neighbours resampling to training data"
+                )
+                resampler = EditedNearestNeighbours()
+                X_train, y_train = resampler.fit_resample(X_train, y_train)
+                logger.info(
+                    f"Resampled training data shape: {X_train.shape}, {y_train.shape}"
+                )
+
+            train_pool = Pool(data=X_train, label=y_train)
             val_pool = Pool(data=self.X[val_idx], label=self.y[val_idx])
 
             model = EnsembleTreeClassifier(**self.hyperparams)
@@ -62,6 +100,9 @@ class EnsembleTreeTrainer(BaseTrainer):
             logger.info(f"Validation Recall: {val_metrics['recall']:.4f}")
             logger.info(f"Validation F1 Score: {val_metrics['f1_score']:.4f}")
 
+            val_metrics["fold"] = i + 1
+            cv_results.append(val_metrics)
+
             if val_metrics["f1_score"] > best_f1_score:
                 best_f1_score = val_metrics["f1_score"]
                 self.best_model = model
@@ -70,6 +111,8 @@ class EnsembleTreeTrainer(BaseTrainer):
         logger.info("Test validation metrics of the best model:")
         for metric, value in best_cv_metrics.items():
             logger.info(f"Best Model {metric}: {value}")
+
+        return pd.DataFrame(cv_results)
 
     def evaluate(self):
         """
