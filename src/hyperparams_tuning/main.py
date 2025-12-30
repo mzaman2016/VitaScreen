@@ -66,9 +66,9 @@ def objective(trial, cfg: DictConfig):
     trainer.setup(data_cfg=cfg.data)
 
     # Evaluate model performance
-    y_true, y_pred = trainer.train()
+    y_true, y_pred = trainer.train(enn=cfg.train.enn)
 
-    return f1_score(y_true=y_true, y_pred=y_pred, average="binary")
+    return f1_score(y_true=y_true, y_pred=y_pred, average="macro")
 
 
 if __name__ == "__main__":
