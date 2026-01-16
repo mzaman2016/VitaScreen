@@ -11,22 +11,22 @@ name: catboost
 #   class_weights: [1, 3]
 
 # Original dataset x customized class weights
-hyperparams:
-  iterations: 1000
-  verbose: 0
-  random_seed: 42
-  eval_metric: AUC
-  class_weights: [1, 3]
-  learning_rate: 0.04037990953434713
-  max_depth: 3
-  subsample: 0.6772374229490887
-  colsample_bylevel: 0.7601245364810707
-  min_data_in_leaf: 78
-  l2_leaf_reg: 4.573175139753625
-  random_strength: 0.07805575047630997
-  bagging_temperature: 0.27292730290786615
-  border_count: 242
-  grow_policy: Depthwise
+# hyperparams:
+#   iterations: 1000
+#   verbose: 0
+#   random_seed: 42
+#   eval_metric: AUC
+#   class_weights: [1, 3]
+#   learning_rate: 0.018654137883074965
+#   max_depth: 12
+#   subsample: 0.6360153070622736
+#   colsample_bylevel: 0.7139345948324589
+#   min_data_in_leaf: 91
+#   l2_leaf_reg: 4.055918682127904
+#   random_strength: 1.2730302417979251
+#   bagging_temperature: 0.9321051345936182
+#   border_count: 149
+#   grow_policy: SymmetricTree
 
 # Original dataset x ENN
 # hyperparams:
@@ -34,34 +34,34 @@ hyperparams:
 #   verbose: 0
 #   random_seed: 42
 #   eval_metric: AUC
-#   learning_rate: 0.007436739055454489
+#   learning_rate: 0.02644224933225267
 #   max_depth: 12
-#   subsample: 0.6785617434718708
-#   colsample_bylevel: 0.6190675255323781
-#   min_data_in_leaf: 11
-#   l2_leaf_reg: 2.9543576545558277
-#   random_strength: 0.00048626305001355814
-#   bagging_temperature: 0.7040328500253457
-#   border_count: 126
-#   grow_policy: Depthwise
+#   subsample: 0.8424014280244982
+#   colsample_bylevel: 0.7650250515054989
+#   min_data_in_leaf: 49
+#   l2_leaf_reg: 2.4633352685945185
+#   random_strength: 0.004634713420057056
+#   bagging_temperature: 0.38673348947540653
+#   border_count: 206
+#   grow_policy: SymmetricTree
 
 # Dataset after feature engineering x customized class weights
-# hyperparams:
-#   iterations: 1000
-#   verbose: 0
-#   random_seed: 42
-#   eval_metric: AUC
-#   class_weights: [1, 3]
-#   learning_rate: 0.11743651961356788
-#   max_depth: 12
-#   subsample: 0.6486434988314246
-#   colsample_bylevel: 0.7838176376440327
-#   min_data_in_leaf: 49
-#   l2_leaf_reg: 4.021579333160483
-#   random_strength: 1.90132481411361
-#   bagging_temperature: 0.2685141247901936
-#   border_count: 243
-#   grow_policy: Lossguide
+hyperparams:
+  iterations: 1000
+  verbose: 0
+  random_seed: 42
+  eval_metric: AUC
+  class_weights: [1, 3]
+  learning_rate: 0.0030289571362206863
+  max_depth: 3
+  subsample: 0.9075011371778876
+  colsample_bylevel: 0.8174504694100226
+  min_data_in_leaf: 84
+  l2_leaf_reg: 5.816440297371427
+  random_strength: 0.0369970391936222
+  bagging_temperature: 0.17302211015540436
+  border_count: 36
+  grow_policy: Depthwise
 
 # Dataset after feature engineering x ENN
 # hyperparams:
@@ -69,16 +69,16 @@ hyperparams:
 #   verbose: 0
 #   random_seed: 42
 #   eval_metric: AUC
-#   learning_rate: 0.010489030807812456
-#   max_depth: 12
-#   subsample: 0.6628035815139937
-#   colsample_bylevel: 0.8222313136450979
-#   min_data_in_leaf: 8
-#   l2_leaf_reg: 1.1758580200346394
-#   random_strength: 0.00017733091929676906
-#   bagging_temperature: 0.17099447601983578
-#   border_count: 152
-#   grow_policy: Depthwise
+#   learning_rate: 0.00694944396903745
+#   max_depth: 4
+#   subsample: 0.8801440519915351
+#   colsample_bylevel: 0.5084557679423829
+#   min_data_in_leaf: 74
+#   l2_leaf_reg: 2.88277066767638
+#   random_strength: 0.6685460709607682
+#   bagging_temperature: 0.08507435368195809
+#   border_count: 94
+#   grow_policy: Lossguide
 
 # 15 selected features x customized class weights
 # hyperparams:
@@ -104,16 +104,16 @@ hyperparams:
 #   verbose: 0
 #   random_seed: 42
 #   eval_metric: AUC
-#   learning_rate: 0.014487403956587177
-#   max_depth: 12
-#   subsample: 0.7761615743034963
-#   colsample_bylevel: 0.7490907648119899
-#   min_data_in_leaf: 24
-#   l2_leaf_reg: 2.702541688882471
-#   random_strength: 0.10458863026432662
-#   bagging_temperature: 0.6512454805574379
-#   border_count: 245
-#   grow_policy: Depthwise
+#   learning_rate: 0.11305012014252402
+#   max_depth: 10
+#   subsample: 0.7336787633870411
+#   colsample_bylevel: 0.8850738230036206
+#   min_data_in_leaf: 52
+#   l2_leaf_reg: 4.376823977102903
+#   random_strength: 4.627817467402233e-09
+#   bagging_temperature: 0.06370200707505386
+#   border_count: 82
+#   grow_policy: SymmetricTree
 
 hyperparams_search_space:
   learning_rate:
