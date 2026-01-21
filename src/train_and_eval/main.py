@@ -27,7 +27,8 @@ def main(cfg: DictConfig):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-    # Data splitting is now handled within each trainer's setup() method
+    # Initialize results directory
+    (Path("results") / cfg.results.model_name).mkdir(parents=True, exist_ok=True)
 
     # Initialize trainer based on model type - all use cross-validation
     transform = nctd_transform if cfg.model.name == ModelType.NCTD.value else None
@@ -38,7 +39,7 @@ def main(cfg: DictConfig):
                 train_cfg=cfg.train,
             )
             trainer.setup(data_cfg=cfg.data)
-            trainer.cross_validate(
+            cv_results = trainer.cross_validate(
                 data_file=Path(cfg.data.file_path),
                 transform=transform,
                 feature_cols=cfg.data.feature_cols
@@ -78,7 +79,7 @@ def main(cfg: DictConfig):
                 train_cfg=cfg.train,
             )
             trainer.setup(data_cfg=cfg.data)
-            trainer.cross_validate(
+            cv_results = trainer.cross_validate(
                 data_file=Path(cfg.data.file_path), img_dir=Path(cfg.igtd.img_dir)
             )
 
@@ -104,7 +105,7 @@ def main(cfg: DictConfig):
         case ModelType.CatBoost.value:
             trainer = EnsembleTreeTrainer(hyperparams=cfg.model.hyperparams)
             trainer.setup(data_cfg=cfg.data)
-            trainer.cross_validate()
+            cv_results = trainer.cross_validate(enn=cfg.train.enn)
 
             logger.info("Evaluating the model on the test set ...")
             y_test, y_pred = trainer.evaluate()
@@ -116,12 +117,20 @@ def main(cfg: DictConfig):
             raise ValueError(f"Unsupported model type: {cfg.model.name}")
 
     # Compute metrics
-    results = [compute_metrics(y_test, y_pred, avg) for avg in cfg.results.avg_options]
+    test_results = [
+        compute_metrics(y_test, y_pred, avg) for avg in cfg.results.avg_options
+    ]
 
     # Export results
-    results_df = pd.DataFrame(results)
-    results_df.to_csv(cfg.results.file_path, index=False)
-    logger.info(f"Predictions for the test set saved to {cfg.results.file_path}")
+    cv_results.to_csv(cfg.results.cv_path, index=False)
+    logger.info(f"Cross-validation results saved to {cfg.results.cv_path}")
+
+    pd.DataFrame(test_results).to_csv(cfg.results.test_path, index=False)
+    logger.info(f"Predictions for the test set saved to {cfg.results.test_path}")
+
+    # Clean up GPU memory if available
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
 
 
 if __name__ == "__main__":
