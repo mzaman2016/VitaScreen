@@ -5,7 +5,6 @@ data:
   dir: data
   file_path: ${data.dir}/cdcNormalDiabetic.csv
   target_col: Label
-  downsample: false
   # feature_cols:
   #   - Age
   #   - GenHlth
@@ -24,6 +23,7 @@ data:
   #   - Smoker
 
 train:
+  enn: true
   max_epochs: 30
   devices: 1
   log_every_n_steps: 50
@@ -35,22 +35,50 @@ results:
     - macro
     - weighted
     - binary
-  file_path: results.csv
-  prob_path: prob/cb_f21_cw_prob.csv
+  model_name: mlp_f21_enn
+  cv_path: results/${results.model_name}/cv_results.csv
+  test_path: results/${results.model_name}/test_results.csv
+  prob_path: results/${results.model_name}/prob.csv
 
 igtd:
-  nrows: 14
-  ncols: 18
-  # nrows: 15
-  # ncols: 9
+  # nrows: 14
+  # ncols: 18
+  nrows: 15
+  ncols: 9
   save_image_size: 3
   max_step: 30000
   val_step: 300
   fea_dist_method: "Euclidean"
   image_dist_method: "Euclidean"
   error: "abs"
-  output_dir: ${data.dir}/IGTD_f21
+  output_dir: ${data.dir}/IGTD_f15
   img_dir: ${igtd.output_dir}/data
 
 # Hyperparameter tuning
 n_trials: 100
+
+ensemble:
+  # models:
+  #   - cb_f21_enn
+  #   - cb_f15_enn
+  #   - mlp_f15_enn
+  # models:
+  #   - cb_f21_cw
+  #   - mlp_f15_cw
+  #   - nctd_f21_enn
+  #   - igtd_f15_enn
+  # models:
+  #   - cb_f21_cw
+  #   - cb_f15_enn
+  #   - mlp_f15_cw
+  #   - nctd_f21_enn
+  #   - igtd_f15_enn
+  models:
+    - cb_f21_enn
+    - cb_f21_cw
+    - mlp_f21_enn
+  # models:
+  #   - cb_f21_cw
+  #   - igtd_f15_enn
+  #   - mlp_f21_enn
+  prob_path: results/{model_name}/prob.csv
