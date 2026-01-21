@@ -5,6 +5,7 @@ from typing import List, Tuple
 import lightning as L
 import pandas as pd
 import torch
+from imblearn.under_sampling import EditedNearestNeighbours
 from lightning.pytorch.callbacks import EarlyStopping, ModelCheckpoint
 from loguru import logger
 from omegaconf import DictConfig
@@ -77,8 +78,20 @@ class NeuralNetTrainer(BaseTrainer):
         img_dir: Path = None,
         transform=None,
         feature_cols: List[str] = None,
-    ) -> None:
-        """Train the model with cross validation."""
+    ) -> pd.DataFrame:
+        """Train the model with cross validation.
+
+        Parameters
+        ----------
+        data_file : Path
+            Path to the data file
+        img_dir : Path, optional
+            Path to image directory for IGTD model
+        transform : Callable, optional
+            Transform function for data preprocessing
+        feature_cols : List[str], optional
+            List of feature column names
+        """
         match self.model_cfg.name:
             case ModelType.MLP.value:
                 dm = NeuralNetDataModule(data_file=data_file, feature_cols=feature_cols)
@@ -97,8 +110,25 @@ class NeuralNetTrainer(BaseTrainer):
 
         best_f1_score = 0.0
         best_cv_metrics = None
+
+        cv_results = []
         for i, (train_idx, val_idx) in enumerate(self.k_fold_indices):
             logger.info(f"Training fold {i + 1}/{len(self.k_fold_indices)}")
+
+            # Apply ENN resampling if enabled
+            if self.train_cfg.enn:
+                logger.info(
+                    "Applying Edited Nearest Neighbours resampling to training data"
+                )
+                resampler = EditedNearestNeighbours()
+                X_train_resampled, y_train_resampled = resampler.fit_resample(
+                    self.X[train_idx], self.y[train_idx]
+                )
+                logger.info(
+                    f"Resampled training data shape: {X_train_resampled.shape}, {y_train_resampled.shape}"
+                )
+                # Get the resampled indices by finding which samples were kept
+                train_idx = train_idx[resampler.sample_indices_]
 
             if self.model_cfg.name == ModelType.IGTD.value:
                 dm.setup(train_idx=train_idx, val_idx=val_idx)
@@ -121,6 +151,9 @@ class NeuralNetTrainer(BaseTrainer):
             logger.info(f"Validation Recall: {val_metrics['recall']:.4f}")
             logger.info(f"Validation F1 Score: {val_metrics['f1_score']:.4f}")
 
+            val_metrics["fold"] = i + 1
+            cv_results.append(val_metrics)
+
             # Track best model
             if val_metrics["f1_score"] > best_f1_score:
                 best_f1_score = val_metrics["f1_score"]
@@ -131,7 +164,18 @@ class NeuralNetTrainer(BaseTrainer):
         for metric, value in best_cv_metrics.items():
             logger.info(f"Best Model {metric}: {value}")
 
+        return pd.DataFrame(cv_results)
+
     def train(self, train_loader: DataLoader, val_loader: DataLoader):
+        """Train the model.
+
+        Parameters
+        ----------
+        train_loader : DataLoader
+            Training data loader
+        val_loader : DataLoader
+            Validation data loader
+        """
         logger.info("Training the model...")
 
         classifier = DiabetesRiskClassifier(

@@ -78,6 +78,20 @@ export PYTHONPATH=src
 python src/hyperparams_tuning/main.py
 ```
 
+### Create ensemble models using predicted probabilities
+
+```bash
+export PYTHONPATH=src
+python src/ensemble/main.py
+```
+
+### Evaluate the statistical significance of the model performance differences
+
+```bash
+export PYTHONPATH=src
+python src/statsig_test/main.py
+```
+
 ---
 
 ## References

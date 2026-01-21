@@ -10,6 +10,7 @@ numpy
 optuna
 pandas
 scikit-learn
+scikit-posthocs
 jupyter
 matplotlib
 seaborn

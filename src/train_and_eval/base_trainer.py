@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from typing import Optional
 
 import numpy as np
@@ -7,7 +8,7 @@ from omegaconf import DictConfig
 from data.utils import split_data
 
 
-class BaseTrainer:
+class BaseTrainer(ABC):
     """
     Base trainer class with shared functionality for data setup.
     """
@@ -27,8 +28,8 @@ class BaseTrainer:
         data_cfg : DictConfig
             Hydra/OmegaConf configuration containing:
                 - file_path: Path to the CDC dataset file.
+                - feature_cols: List of feature column names.
                 - target_col: Name of the target variable column.
-                - downsample: Whether to downsample the data for addressing class imbalance.
         """
         df = pd.read_csv(data_cfg.file_path)
 
@@ -41,8 +42,27 @@ class BaseTrainer:
         k_fold_indices, test_idx = split_data(
             X=self.X,
             y=self.y,
-            downsample=data_cfg.downsample,
         )
 
         self.k_fold_indices = k_fold_indices
         self.test_idx = test_idx
+
+    @abstractmethod
+    def train(self):
+        """Train the model. To be implemented by subclasses."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def cross_validate(self):
+        """Train the model with cross validation. To be implemented by subclasses."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def evaluate(self):
+        """Evaluate the model. To be implemented by subclasses."""
+        raise NotImplementedError
+
+    @abstractmethod
+    def export_prob(self):
+        """Export predicted probabilities. To be implemented by subclasses."""
+        raise NotImplementedError
