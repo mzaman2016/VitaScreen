@@ -38,9 +38,7 @@ random_state = 42
 early_stopping_rounds = 50
 best_score = 0
 best_cv_metrics = None
-for fold, (train_idx, val_idx) in enumerate(
-    cv.split(X_train_val, y_train_val), 1
-):
+for fold, (train_idx, val_idx) in enumerate(cv.split(X_train_val, y_train_val), 1):
     print(f"\nFold {fold}")
     X_train, X_val = (
         X_train_val.iloc[train_idx],
@@ -76,7 +74,9 @@ for fold, (train_idx, val_idx) in enumerate(
 
     y_pred = model.predict(X_val)
     y_pred_proba = model.predict_proba(X_val)[:, 1]
-    val_metrics = compute_metrics(y_val, y_pred, avg_option="macro", y_pred_proba=y_pred_proba)
+    val_metrics = compute_metrics(
+        y_val, y_pred, avg_option="macro", y_pred_proba=y_pred_proba
+    )
 
     print(f"Validation Accuracy: {val_metrics['accuracy']:.4f}")
     print(f"Validation Precision: {val_metrics['precision']:.4f}")
@@ -105,7 +105,10 @@ y_pred_proba = model.predict_proba(X_test)[:, 1]
 # avg_options = ["micro", "macro", "weighted", "binary"]
 avg_options = ["macro"]
 
-results = [compute_metrics(y_test, y_pred, avg, y_pred_proba=y_pred_proba) for avg in avg_options]
+results = [
+    compute_metrics(y_test, y_pred, avg, y_pred_proba=y_pred_proba)
+    for avg in avg_options
+]
 results_df = pd.DataFrame(results)
 # results_df.to_csv("results.csv", index=False)
 
