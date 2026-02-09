@@ -1017,6 +1017,8 @@ def table_to_image(
     cp.dump(time, output)
     output.close()
 
+    return index
+
 
 def multi_generate_image_data(
     data_list, index, num_row, num_column, coord, image_folder=None, file_name=""

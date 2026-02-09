@@ -64,13 +64,11 @@ def objective(trial, cfg: DictConfig):
         hyperparams=OmegaConf.merge({}, cfg.model.hyperparams, params_cfg)
     )
     trainer.setup(data_cfg=cfg.data)
-    trainer.train()
 
-    # Evaluate the model
-    logger.info("Evaluating the model...")
-    y_preds = trainer.model.predict(trainer.X_val)
+    # Evaluate model performance
+    y_true, y_pred = trainer.train(enn=cfg.train.enn)
 
-    return f1_score(y_true=trainer.y_val, y_pred=y_preds, average="binary")
+    return f1_score(y_true=y_true, y_pred=y_pred, average="macro")
 
 
 if __name__ == "__main__":

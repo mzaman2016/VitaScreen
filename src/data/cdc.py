@@ -1,67 +1,16 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Callable, Tuple
+from typing import Callable, List, Tuple
 
+import lightning as L
 import numpy as np
 import pandas as pd
-import pytorch_lightning as pl
 import torch
-from imblearn.under_sampling import EditedNearestNeighbours
 from loguru import logger
 from PIL import Image
-from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from torch.utils.data import DataLoader, Dataset, Subset
 from torchvision import transforms
-
-
-def prepare_data(
-    data_file: Path, target_col: str, downsample: bool = False
-) -> Tuple[
-    Tuple[np.ndarray, np.ndarray],
-    Tuple[np.ndarray, np.ndarray],
-    Tuple[np.ndarray, np.ndarray],
-]:
-    """Load and prepare data for training
-
-    Parameters
-    ----------
-    data_file : Path
-        Path to the CSV file containing the dataset
-    target_col : str
-        Name of the target column in the dataset
-    downsample : bool, optional
-        Whether to downsample the negative class data, by default False
-
-    Returns
-    -------
-    Tuple[ Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], Tuple[np.ndarray, np.ndarray], ]
-        Returns training, validation, and test datasets as tuples of features and labels
-    """
-
-    # Load raw data
-    df = pd.read_csv(data_file)
-    feature_cols = [col for col in df.columns if col != target_col]
-
-    # Split data for training, validation, and testing
-    X, y = df[feature_cols].values, df[target_col].values
-    X_train_val, X_test, y_train_val, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
-
-    if downsample:
-        # Resampling using Edited Nearest Neighbours
-        enn = EditedNearestNeighbours()
-        X_train_val, y_train_val = enn.fit_resample(X_train_val, y_train_val)
-        logger.info(
-            f"Resampled training data shape: {X_train_val.shape}, {y_train_val.shape}"
-        )
-
-    X_train, X_val, y_train, y_val = train_test_split(
-        X_train_val, y_train_val, test_size=0.2, random_state=42
-    )
-
-    return (X_train, y_train), (X_val, y_val), (X_test, y_test)
 
 
 class NeuralNetCDCDataset(Dataset):
@@ -162,7 +111,10 @@ class IgtdCDCDataset(Dataset):
             If the labels series does not cover all required indices.
         """
         self.img_dir = img_dir
-        self.img_files = sorted(img_dir.glob("*_image.png"))
+        # Sort files numerically by index to match CSV row order
+        self.img_files = sorted(
+            img_dir.glob("*_image.png"), key=lambda f: int(f.name.split("_")[1])
+        )
 
         # Extract indices from filenames like _123_image.png
         self.indices = [int(f.name.split("_")[1]) for f in self.img_files]
@@ -215,7 +167,7 @@ class IgtdCDCDataset(Dataset):
         return x, y
 
 
-class CDCDataModule(pl.LightningDataModule, ABC):
+class CDCDataModule(L.LightningDataModule, ABC):
     """PyTorch Lightning DataModule for handling CDC datasets."""
 
     def __init__(
@@ -322,7 +274,8 @@ class NeuralNetDataModule(CDCDataModule):
     def __init__(
         self,
         data_file: Path,
-        target_col: str,
+        target_col: str = "Label",
+        feature_cols: List[str] = None,
         batch_size: int = 64,
         num_workers: int = 4,
     ):
@@ -347,7 +300,23 @@ class NeuralNetDataModule(CDCDataModule):
             num_workers=num_workers,
         )
 
-    def setup(self, transform: Callable = None, downsample: bool = False):
+        if not self.data_file.exists():
+            raise FileNotFoundError(f"Data file {self.data_file} does not exist.")
+
+        df = pd.read_csv(self.data_file)
+        if feature_cols is None:
+            feature_cols = [col for col in df.columns if col != self.target_col]
+
+        self.X, self.y = df[feature_cols].values, df[self.target_col].values
+
+    def setup(
+        self,
+        train_idx: np.ndarray,
+        val_idx: np.ndarray,
+        test_idx: np.ndarray = None,
+        transform: Callable = None,
+        # downsample: bool = False
+    ):
         """
         Prepare the data splits and initialize datasets.
 
@@ -360,34 +329,27 @@ class NeuralNetDataModule(CDCDataModule):
               - the number of features
             and return a transformed feature vector.
             If None, no transformation is applied.
-        downsample : bool, optional
-            Whether to downsample the dataset for quicker experiments.
-            Default is False.
-
-        Raises
-        ------
-        FileNotFoundError
-            If the specified data_file does not exist.
         """
-        if not self.data_file.exists():
-            raise FileNotFoundError(f"Data file {self.data_file} does not exist.")
 
-        (X_train, y_train), (X_val, y_val), (X_test, y_test) = prepare_data(
-            data_file=self.data_file,
-            target_col=self.target_col,
-            downsample=downsample,
-        )
+        X_train, y_train = self.X[train_idx], self.y[train_idx]
+        X_val, y_val = self.X[val_idx], self.y[val_idx]
 
         # Scale the features
         scaler = MinMaxScaler()
         X_train = scaler.fit_transform(X_train)
         X_val = scaler.transform(X_val)
-        X_test = scaler.transform(X_test)
 
         # Initialize datasets
         self.train_dataset = NeuralNetCDCDataset(X_train, y_train, transform)
         self.val_dataset = NeuralNetCDCDataset(X_val, y_val, transform)
-        self.test_dataset = NeuralNetCDCDataset(X_test, y_test, transform)
+
+        if test_idx is not None:
+            X_test, y_test = self.X[test_idx], self.y[test_idx]
+            X_test = scaler.transform(X_test)
+            self.test_dataset = NeuralNetCDCDataset(X_test, y_test, transform)
+
+        else:
+            self.test_dataset = None
 
 
 class IgtdDataModule(CDCDataModule):
@@ -431,9 +393,11 @@ class IgtdDataModule(CDCDataModule):
         )
         self.img_dir = img_dir
 
-    def setup(self):
+    def setup(
+        self, train_idx: np.ndarray, val_idx: np.ndarray, test_idx: np.ndarray = None
+    ):
         """
-        Load and split the IGTD dataset and transformed images.
+        Load and split the IGTD images for cross-validation.
 
         Raises
         ------
@@ -446,14 +410,13 @@ class IgtdDataModule(CDCDataModule):
             )
 
         df = pd.read_csv(self.data_file)
-        train_val_idx, test_idx = train_test_split(
-            df.index, test_size=0.1, random_state=42
-        )
-        train_idx, val_idx = train_test_split(
-            train_val_idx, test_size=0.2, random_state=42
-        )
-
         full_dataset = IgtdCDCDataset(img_dir=self.img_dir, labels=df[self.target_col])
+
         self.train_dataset = Subset(full_dataset, train_idx)
         self.val_dataset = Subset(full_dataset, val_idx)
-        self.test_dataset = Subset(full_dataset, test_idx)
+
+        if test_idx is not None:
+            self.test_dataset = Subset(full_dataset, test_idx)
+
+        else:
+            self.test_dataset = None

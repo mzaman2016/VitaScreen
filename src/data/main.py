@@ -21,7 +21,10 @@ def main(cfg: DictConfig):
     df = pd.read_csv(cfg.data.file_path)
     logger.info(f"Data shape: {df.shape}")
 
-    feature_cols = [col for col in df.columns if col != cfg.data.target_col]
+    if "feature_cols" in cfg.data:
+        feature_cols = cfg.data.feature_cols
+    else:
+        feature_cols = [col for col in df.columns if col != cfg.data.target_col]
     logger.info(f"Number of features: {len(feature_cols)}")
 
     # Create polynomial features

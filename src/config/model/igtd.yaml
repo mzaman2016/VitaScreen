@@ -4,4 +4,4 @@ input_dim:
   nrows: ${igtd.nrows}
   ncols: ${igtd.ncols}
 
-pos_weight: 2.7
+pos_weight: 3

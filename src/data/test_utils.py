@@ -1,6 +1,6 @@
 import numpy as np
 
-from data.transform import nctd_transform
+from data.utils import nctd_transform
 
 
 def test_nctd_transform():

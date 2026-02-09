@@ -2,11 +2,12 @@
 import pandas as pd
 from catboost import CatBoostClassifier, Pool
 from sklearn.model_selection import train_test_split
-from utils import compute_metrics
+
+from notebooks.utils import compute_metrics
 
 # %%
 # Load the dataset
-df = pd.read_csv("../data/cdcNormalDiabetic.csv")
+df = pd.read_csv("data/cdcNormalDiabetic.csv")
 print(df.shape)
 print(df.columns)
 
@@ -84,3 +85,7 @@ avg_options = ["micro", "macro", "weighted", "binary"]
 results = [compute_metrics(y_test, y_pred, avg) for avg in avg_options]
 results_df = pd.DataFrame(results)
 results_df.to_csv("results.csv", index=False)
+
+print(results_df)
+
+# binary  0.803473   0.413954  0.614910  0.494807

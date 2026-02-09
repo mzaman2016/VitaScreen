@@ -1,10 +1,10 @@
-import pytorch_lightning as pl
+import lightning as L
 import torch
 import torch.nn as nn
 import torchmetrics
 
 
-class DiabetesRiskClassifier(pl.LightningModule):
+class DiabetesRiskClassifier(L.LightningModule):
     def __init__(self, model, batch_size: int, pos_weight: float = None):
         super(DiabetesRiskClassifier, self).__init__()
         self.save_hyperparameters()
@@ -20,7 +20,10 @@ class DiabetesRiskClassifier(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x).squeeze()  # Remove extra dimensions
+        y_hat = self.forward(x).view(-1)  # Ensure 1D tensor for metrics and loss
+        y = y.view(
+            -1
+        ).float()  # Ensure 1D tensor for metrics and loss and cast to float
         loss = self.loss_fn(y_hat, y)
         self.log(
             "train_loss",
@@ -43,7 +46,10 @@ class DiabetesRiskClassifier(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x).squeeze()
+        y_hat = self.forward(x).view(-1)
+        y = y.view(
+            -1
+        ).float()  # Ensure 1D tensor for metrics and loss and cast to float
         loss = self.loss_fn(y_hat, y)
         self.log(
             "val_loss",
@@ -64,7 +70,10 @@ class DiabetesRiskClassifier(pl.LightningModule):
 
     def test_step(self, batch, batch_idx):
         x, y = batch
-        y_hat = self.forward(x).squeeze()
+        y_hat = self.forward(x).view(-1)
+        y = y.view(
+            -1
+        ).float()  # Ensure 1D tensor for metrics and loss and cast to float
         loss = self.loss_fn(y_hat, y)
         self.log("test_loss", loss)
         self.log("test_f1", self.f1(y_hat, y.float()), prog_bar=True)

@@ -2,6 +2,8 @@
 
 VitaScreen is a prototype solution designed to predict the risk of diabetes using a combination of health indicators and socioeconomic factors. It leverages patient data to enable early risk assessment and support preventive healthcare strategies.
 
+![Methodology Diagram](img/methodology.png)
+
 ---
 
 ## 🚀 Features
@@ -59,7 +61,7 @@ python src/data/main.py
 
 ```bash
 export PYTHONPATH=src
-python src/train/main.py model=<model_type>
+python src/train_and_eval/main.py model=<model_type>
 ```
 
 Supported model types:
@@ -74,6 +76,20 @@ Supported model types:
 ```bash
 export PYTHONPATH=src
 python src/hyperparams_tuning/main.py
+```
+
+### Create ensemble models using predicted probabilities
+
+```bash
+export PYTHONPATH=src
+python src/ensemble/main.py
+```
+
+### Evaluate the statistical significance of the model performance differences
+
+```bash
+export PYTHONPATH=src
+python src/statsig_test/main.py
 ```
 
 ---
