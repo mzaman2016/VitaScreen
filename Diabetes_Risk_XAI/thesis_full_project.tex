@@ -1,0 +1,176 @@
+% Thesis: Explainable AI for Diabetes Risk Prediction Using Grad-CAM and IGTD
+% Reference: Rabia's project report style. Use "I" (single author).
+
+\documentclass[12pt]{dalthesis}
+
+\usepackage{geometry}
+\geometry{a4paper, margin=1in}
+
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{nomencl}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{adjustbox}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{pdflscape}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{hyperref}
+\usepackage{multicol}
+\usepackage{placeins}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{pifont}
+\makenomenclature
+
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\lstset{
+    basicstyle=\ttfamily\small,
+    breaklines=true,
+    frame=single,
+    numbers=left,
+    numberstyle=\tiny,
+    keywordstyle=\color{blue},
+    commentstyle=\color{codegreen},
+}
+\newcommand{\xmark}{\ding{55}}
+
+\begin{document}
+
+\title{Explainable AI for Diabetes Risk Prediction Using Grad-CAM and IGTD}
+\author{Name of the student}
+
+\macs  
+\degreeinitial{M.A.C.Sc.}
+\faculty{Computer Science}
+\dept{Faculty of Computer Science}
+
+\defencemonth{Dec}
+\defenceyear{2024}
+
+\makenomenclature
+\renewcommand{\nomname}{List of Abbreviations and Symbols Used}
+
+\nomenclature[A]{\textbf{CDC}}{Centers for Disease Control and Prevention}
+\nomenclature[A]{\textbf{CNN}}{Convolutional Neural Network}
+\nomenclature[A]{\textbf{ENN}}{Edited Nearest Neighbors}
+\nomenclature[A]{\textbf{Grad-CAM}}{Gradient-weighted Class Activation Mapping}
+\nomenclature[A]{\textbf{IGTD}}{Image Generator for Tabular Data}
+\nomenclature[A]{\textbf{XAI}}{Explainable Artificial Intelligence}
+
+\frontmatter
+
+\begin{abstract}
+This report presents an Explainable AI (XAI) approach for diabetes risk prediction. I first used the CDC Diabetes Health Indicators dataset with 500 samples. I converted the tabular data into 5$\times$3 images using IGTD, applied ENN (k=3) to handle class imbalance, and trained a CNN model (cnn\_igtd\_f15\_enn) from Shenghao Wang et al. The data was split 80\% for training and 20\% for testing. I achieved 89\% accuracy, 54\% precision, 58\% recall, and 0.56 F1-Score. Later, I received a new CDC dataset (cdcNormalDiabeticFE1\_20RFFSQ.csv). On this dataset, I applied the same IGTD and CNN pipeline and added Grad-CAM for explainability. The model reached 84\% accuracy. Grad-CAM heatmaps with feature names and color scales help explain why the model made each prediction. The implementation is available on GitHub: \url{https://github.com/mzaman2016/VitaScreen}.
+\end{abstract}
+
+\addcontentsline{toc}{chapter}{List of Abbreviations and Symbols Used}
+\printnomenclature
+
+\listoffigures
+
+\begin{acknowledgements}
+% Add your acknowledgements here.
+\end{acknowledgements}
+
+\mainmatter
+
+% ==================== CHAPTER 1: INTRODUCTION ====================
+\chapter{Introduction}
+
+\section{Overview}
+
+Diabetes is a major global health concern. Early risk assessment can support preventive care. Machine learning models can predict diabetes risk from health indicators. However, many models work like black boxes. It is hard to see why they make a certain decision. This work applies Explainable AI (XAI) using Grad-CAM to a CNN that predicts diabetes from tabular data. The tabular data is first transformed into images using IGTD.
+
+\section{Problem Statement}
+
+Deep learning models for healthcare often lack transparency. Clinicians and patients need to understand why a model predicts a certain outcome. I address this by integrating Grad-CAM into a diabetes prediction pipeline. Grad-CAM highlights which input features drive each prediction.
+
+\section{Motivation}
+
+Trust in AI systems requires explainability. Grad-CAM provides visual explanations. It shows which regions of the input (IGTD images) the CNN focuses on. This helps validate model behavior and identify potential biases.
+
+\section{Major Contributions}
+
+\begin{itemize}
+\item I implemented a full pipeline: CDC dataset $\rightarrow$ IGTD $\rightarrow$ CNN $\rightarrow$ Grad-CAM.
+\item I added feature names and color scales to Grad-CAM visualizations for interpretability.
+\item I achieved 89\% accuracy on the old CDC dataset and 84\% accuracy on the new dataset with the cnn\_igtd\_f15\_enn architecture.
+\item I integrated the work with the VitaScreen GitHub repository.
+\end{itemize}
+
+\section{Organization of the report}
+
+This thesis is organized as follows. Chapter~\ref{ch:background} covers background on IGTD, CNNs, ENN, and Grad-CAM. Chapter~\ref{ch:lit} reviews related work. Chapter~\ref{ch:method} describes the methodology. Chapter~\ref{ch:impl} presents implementation details. Chapter~\ref{ch:results} discusses results. Chapter~\ref{ch:conclusion} concludes with limitations and future work.
+
+% ==================== CHAPTER 2: BACKGROUND KNOWLEDGE ====================
+\chapter{Background Knowledge}\label{ch:background}
+
+\section{IGTD (Image Generator for Tabular Data)}
+
+IGTD converts tabular data into 2D images. It optimizes the arrangement of features in a grid. Similar features are placed close together. I use a 5$\times$3 grid for 15 features. This lets a CNN process health data as images instead of raw numbers. I followed the work of Zhu et al. for the IGTD algorithm.
+
+\section{CNN Architecture}
+
+I use Shenghao Wang et al.'s cnn\_igtd\_f15\_enn architecture. It has 4 convolutional blocks with 64 filters and 3$\times$3 kernels. Each block has BatchNorm and ReLU. The model uses Global Average Pooling, 50\% Dropout, and a fully connected output layer. It takes a 5$\times$3 grayscale image and outputs a probability (diabetic or non-diabetic).
+
+\section{Grad-CAM}
+
+Grad-CAM is an Explainable AI method. It shows which parts of an image the CNN focused on when making a prediction. It uses the gradients of the output with respect to the last convolutional layer's activations. Red indicates high importance. Blue indicates low importance. I followed the work of Selvaraju et al. for Grad-CAM.
+
+\section{ENN (Edited Nearest Neighbors)}
+
+ENN removes noisy or borderline samples from the training set. It uses k-Nearest Neighbors with k=3. Samples that are misclassified by their neighbors are removed. This helps with class imbalance. I apply ENN only on the training set before IGTD.
+
+\section{CDC Diabetes Dataset}
+
+The CDC diabetes dataset contains health indicators. The 15 features I use are: HighBP, HighChol, CholCheck, BMI, Smoker, Stroke, HeartDiseaseorAttack, PhysActivity, Fruits, Veggies, HvyAlcoholConsump, AnyHealthcare, NoDocbcCost, GenHlth, and MentHlth. The label is binary: 0 = Non-Diabetic, 1 = Diabetic (or prediabetic).
+
+\section{Work Flow: Old Dataset and New Dataset}
+
+First, I used the CDC Diabetes Health Indicators dataset with 500 samples. Each sample has 15 health features and a label (diabetic or non-diabetic). I converted the tabular data into 5$\times$3 images using IGTD. I applied ENN (k=3) to handle class imbalance. I trained a CNN model (cnn\_igtd\_f15\_enn) from Shenghao Wang et al. The data was split 80\% for training and 20\% for testing. I achieved 89\% accuracy, 54\% precision, 58\% recall, and 0.56 F1-Score. I followed two literature for this: Zhu et al. (IGTD) and Shenghao Wang et al. (CNN model).
+
+Later, I received a new CDC dataset (cdcNormalDiabeticFE1\_20RFFSQ.csv). On this dataset, I used a CNN with IGTD to turn tabular health data into images and predict diabetes risk. I added Grad-CAM to show which parts of each image the model used to make its prediction. The model reached 84\% accuracy on the test set. It performed better on non-diabetic than diabetic cases due to class imbalance. Grad-CAM heatmaps with feature names and color scales help explain why the model made each prediction. I used the same 15 features as before.
+
+% ==================== PLACEHOLDER CHAPTERS (content to be added) ====================
+\chapter{Literature Review}\label{ch:lit}
+
+% TODO: Add literature review. Summarize Zhu et al. (IGTD), Selvaraju et al. (Grad-CAM), Shenghao Wang et al. (VitaScreen). Compare with your work.
+
+\chapter{Proposed Methodology}\label{ch:method}
+
+% TODO: Add methodology. Describe pipeline: Load data, 15 features, 80:20 split, ENN, IGTD, CNN, Grad-CAM. Explain feature names and scales on heatmaps.
+
+\chapter{Implementation}\label{ch:impl}
+
+% TODO: Add implementation. Describe diabetes\_prediction\_pipeline.py (base) and gradcam\_explainability.py (XAI). GitHub link and how to run.
+
+\chapter{Result Discussion}\label{ch:results}
+
+% TODO: Add results. Include Table 1 (Old dataset: Acc 0.89, Prec 0.54, Recall 0.58, F1 0.56). Include Table 2 (New dataset: Acc 0.84, Prec 0.38, Recall 0.50, F1 0.43). Add 8 Grad-CAM figures. Discuss findings.
+
+\chapter{Conclusion}\label{ch:conclusion}
+
+% TODO: Add conclusion. Summarize: built explainable pipeline, 84\% accuracy on new dataset, Grad-CAM with feature names and scales, GitHub integration.
+
+\chapter{Limitations and Future Work}
+
+\section{Limitations}
+
+% TODO: Add limitations. Class imbalance, Grad-CAM shows spatial regions not direct feature importance, 500 samples used.
+
+\section{Future Work}
+
+% TODO: Add future work. SHAP/LIME, full dataset, web app, NCTD.
+
+\bibliographystyle{plain}
+\bibliography{report}
+
+\end{document}
