@@ -107,6 +107,11 @@ def main(cfg: DictConfig):
             trainer.setup(data_cfg=cfg.data)
             cv_results = trainer.cross_validate(enn=cfg.train.enn)
 
+            # Save best CatBoost model for SHAP explainability
+            model_path = Path("results") / cfg.results.model_name / "catboost_best.cbm"
+            trainer.best_model.model.save_model(str(model_path))
+            logger.info(f"Saved best CatBoost model to {model_path}")
+
             logger.info("Evaluating the model on the test set ...")
             y_test, y_pred = trainer.evaluate()
 

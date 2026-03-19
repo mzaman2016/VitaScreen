@@ -180,3 +180,7 @@ lightning_logs/
 
 # Hydra outputs
 outputs/
+
+# Generated outputs
+results/
+*.npy

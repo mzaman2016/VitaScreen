@@ -8,16 +8,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import seaborn as sns
-from sklearn.feature_selection import SelectKBest, f_classif
-
 from IGTD_Functions import (
+    IGTD,
     generate_feature_distance_ranking,
     generate_matrix_distance_ranking,
     min_max_transform,
     select_features_by_variation,
     table_to_image,
-    IGTD
 )
+from sklearn.feature_selection import SelectKBest, f_classif
 
 # %%
 # Load the dataset
@@ -61,10 +60,12 @@ ranking_feature, corr
 
 # %%
 # Plot the source matrix
-def plot_dissimilarity_matrices(corr, ranking_feature, feature_names=None, figsize=(15, 6)):
+def plot_dissimilarity_matrices(
+    corr, ranking_feature, feature_names=None, figsize=(15, 6)
+):
     """
     Visualize the dissimilarity matrix and dissimilarity ranking matrix with values annotated.
-    
+
     Parameters:
         corr (ndarray): Dissimilarity matrix (1 - correlation).
         ranking_feature (ndarray): Dissimilarity ranking matrix.
@@ -87,7 +88,7 @@ def plot_dissimilarity_matrices(corr, ranking_feature, feature_names=None, figsi
         square=True,
         cbar_kws={"label": "1 - Correlation"},
         annot=True,
-        fmt=".2f"
+        fmt=".2f",
     )
     axs[0].set_title("Dissimilarity Matrix (1 - Correlation)")
 
@@ -99,17 +100,18 @@ def plot_dissimilarity_matrices(corr, ranking_feature, feature_names=None, figsi
         square=True,
         cbar_kws={"label": "Dissimilarity Rank"},
         annot=True,
-        fmt=".0f"
+        fmt=".0f",
     )
     axs[1].set_title("Dissimilarity Ranking")
 
     plt.tight_layout()
     plt.show()
 
+
 plot_dissimilarity_matrices(
     corr=corr,
     ranking_feature=ranking_feature,
-    feature_names=list(X.columns)  # or None if not available
+    feature_names=list(X.columns),  # or None if not available
 )
 
 # %%
@@ -125,7 +127,9 @@ coordinate, ranking_image
 
 # %%
 # Plot the target matrix
-def plot_ranking_matrix(ranking: np.ndarray, feature_names: list, title="Ranking Matrix", cmap="viridis"):
+def plot_ranking_matrix(
+    ranking: np.ndarray, feature_names: list, title="Ranking Matrix", cmap="viridis"
+):
     """
     Plots a ranking matrix with feature names annotated along the axes.
 
@@ -137,7 +141,9 @@ def plot_ranking_matrix(ranking: np.ndarray, feature_names: list, title="Ranking
     """
 
     assert ranking.shape[0] == ranking.shape[1], "Matrix must be square."
-    assert ranking.shape[0] == len(feature_names), "Feature name count must match matrix size."
+    assert ranking.shape[0] == len(
+        feature_names
+    ), "Feature name count must match matrix size."
 
     plt.figure(figsize=(8, 6))
     ax = sns.heatmap(
@@ -148,14 +154,15 @@ def plot_ranking_matrix(ranking: np.ndarray, feature_names: list, title="Ranking
         annot=True,
         fmt=".0f",
         cbar_kws={"label": "Ranking"},
-        square=True
+        square=True,
     )
 
     ax.set_title(title, fontsize=14)
-    ax.tick_params(axis='x', rotation=45, labelsize=9)
-    ax.tick_params(axis='y', rotation=0, labelsize=9)
+    ax.tick_params(axis="x", rotation=45, labelsize=9)
+    ax.tick_params(axis="y", rotation=0, labelsize=9)
     plt.tight_layout()
     plt.show()
+
 
 plot_ranking_matrix(ranking_image, selected_features, "Ranking Image", "Blues")
 
@@ -210,14 +217,14 @@ print(f"Time: {time}")
 index_record, _, _ = IGTD(
     source=ranking_feature,
     target=ranking_image,
-    err_measure="abs",         # use the same error used previously
-    max_step=30000,            # use the same as before
+    err_measure="abs",  # use the same error used previously
+    max_step=30000,  # use the same as before
     switch_t=0,
     val_step=300,
     min_gain=0.000001,
     random_state=1,
-    save_folder=result_dir,         # don't need to save plots again
-    file_name=""
+    save_folder=result_dir,  # don't need to save plots again
+    file_name="",
 )
 
 # %%
