@@ -182,5 +182,4 @@ lightning_logs/
 outputs/
 
 # Generated outputs
-results/
 *.npy

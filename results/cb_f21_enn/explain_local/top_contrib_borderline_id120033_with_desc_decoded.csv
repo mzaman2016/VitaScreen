@@ -1,0 +1,22 @@
+feature,feature_value,shap_value,Description,Type,Role,value_meaning
+BMI,22.0,-0.8457948844578147,Body Mass Index,Integer,Feature,
+HighBP,1.0,0.505647799237089,0 = no high BP 1 = high BP,Binary,Feature,Yes
+GenHlth,3.0,0.3253435809682234,Would you say that in general your health is: scale 1-5 1 = excellent 2 = very good 3 = good 4 = fair 5 = poor,Integer,Feature,Good
+HighChol,1.0,0.2740050985030605,0 = no high cholesterol 1 = high cholesterol,Binary,Feature,Yes
+Age,10.0,0.272197774151913,13-level age category (_AGEG5YR see codebook) 1 = 18-24 9 = 60-64 13 = 80 or older,Integer,Feature,65–69
+Income,3.0,0.1346216688741096,"Income scale (INCOME2 see codebook) scale 1-8 1 = less than $10,000 5 = less than $35,000 8 = $75,000 or more",Integer,Feature,< $20k
+Sex,0.0,-0.0314921927318663,0 = female 1 = male,Binary,Feature,Female
+DiffWalk,0.0,-0.0297965928994746,Do you have serious difficulty walking or climbing stairs? 0 = no 1 = yes,Binary,Feature,No
+HeartDiseaseorAttack,0.0,-0.0151154247585185,coronary heart disease (CHD) or myocardial infarction (MI) 0 = no 1 = yes,Binary,Feature,No
+HvyAlcoholConsump,0.0,0.0089781788740482,Heavy drinkers (adult men having more than 14 drinks per week and adult women having more than 7 drinks per week) 0 = no 1 = yes,Binary,Feature,No
+CholCheck,1.0,0.0016272127963664,0 = no cholesterol check in 5 years 1 = yes cholesterol check in 5 years,Binary,Feature,Yes
+Stroke,0.0,-0.0005512562943078,(Ever told) you had a stroke. 0 = no 1 = yes,Binary,Feature,No
+PhysHlth,0.0,-0.0002440890419077,"Now thinking about your physical health, which includes physical illness and injury, for how many days during the past 30 days was your physical health not good? scale 1-30 days",Integer,Feature,
+MentHlth,0.0,0.0001878117255983,"Now thinking about your mental health, which includes stress, depression, and problems with emotions, for how many days during the past 30 days was your mental health not good? scale 1-30 days",Integer,Feature,
+Education,4.0,0.0001617969564679,Education level (EDUCA see codebook) scale 1-6 1 = Never attended school or only kindergarten 2 = Grades 1 through 8 (Elementary) 3 = Grades 9 through 11 (Some high school) 4 = Grade 12 or GED (High school graduate) 5 = College 1 year to 3 years (Some college or technical school) 6 = College 4 years or more (College graduate),Integer,Feature,Grade 12 or GED
+PhysActivity,1.0,-2.5646240928473754e-05,physical activity in past 30 days - not including job 0 = no 1 = yes,Binary,Feature,Yes
+Fruits,1.0,0.0,Consume Fruit 1 or more times per day 0 = no 1 = yes,Binary,Feature,Yes
+Veggies,1.0,0.0,Consume Vegetables 1 or more times per day 0 = no 1 = yes,Binary,Feature,Yes
+AnyHealthcare,1.0,0.0,"Have any kind of health care coverage, including health insurance, prepaid plans such as HMO, etc. 0 = no 1 = yes",Binary,Feature,Yes
+NoDocbcCost,0.0,0.0,Was there a time in the past 12 months when you needed to see a doctor but could not because of cost? 0 = no 1 = yes,Binary,Feature,No
+Smoker,0.0,0.0,Have you smoked at least 100 cigarettes in your entire life? [Note: 5 packs = 100 cigarettes] 0 = no 1 = yes,Binary,Feature,No

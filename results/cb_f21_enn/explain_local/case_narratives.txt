@@ -1,0 +1,39 @@
+Case ID 188559 (HIGH):
+  Ground truth: 0 (No diabetes) | Model: 0.918 (High risk) | MISMATCH
+  Main factors increasing risk: GenHlth = Poor; BMI = 42.0; HighBP = Yes
+  Main factors decreasing risk: Sex = Female; Stroke = No
+
+Case ID 85294 (HIGH):
+  Ground truth: 1 (Prediabetes/Diabetes) | Model: 0.918 (High risk) | MATCH
+  Main factors increasing risk: GenHlth = Fair; BMI = 39.0; HighBP = Yes
+  Main factors decreasing risk: Sex = Female; PhysHlth = 2.0
+
+Case ID 76469 (HIGH):
+  Ground truth: 0 (No diabetes) | Model: 0.918 (High risk) | MISMATCH
+  Main factors increasing risk: GenHlth = Fair; BMI = 71.0; HighBP = Yes
+  Main factors decreasing risk: MentHlth = 26.0; Stroke = No
+
+Case ID 135758 (LOW):
+  Ground truth: 0 (No diabetes) | Model: 0.042 (Low risk) | MATCH
+  Main factors increasing risk: MentHlth = 0.0
+  Main factors decreasing risk: GenHlth = Excellent; Age = 35–39
+
+Case ID 36582 (LOW):
+  Ground truth: 0 (No diabetes) | Model: 0.042 (Low risk) | MATCH
+  Main factors increasing risk: None
+  Main factors decreasing risk: GenHlth = Excellent; Age = 35–39
+
+Case ID 186987 (LOW):
+  Ground truth: 0 (No diabetes) | Model: 0.042 (Low risk) | MATCH
+  Main factors increasing risk: PhysHlth = 7.0
+  Main factors decreasing risk: GenHlth = Excellent; Age = 30–34
+
+Case ID 251363 (BORDERLINE):
+  Ground truth: 1 (Prediabetes/Diabetes) | Model: 0.500 (High risk) | MATCH
+  Main factors increasing risk: HighBP = Yes; GenHlth = Good; HighChol = Yes
+  Main factors decreasing risk: BMI = 22.0; Sex = Female
+
+Case ID 120033 (BORDERLINE):
+  Ground truth: 0 (No diabetes) | Model: 0.500 (High risk) | MISMATCH
+  Main factors increasing risk: HighBP = Yes; GenHlth = Good; HighChol = Yes
+  Main factors decreasing risk: BMI = 22.0; Sex = Female
