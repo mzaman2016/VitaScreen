@@ -1,46 +1,65 @@
-# GRAD-CAM Pipeline – New Dataset with Explainable AI
+# GRAD-CAM Pipeline
 
-This folder contains the **Grad-CAM** pipeline for diabetes risk prediction using the **new CDC dataset** (cdcNormalDiabeticFE1_20RFFSQ.csv or UCI fallback). It adds Grad-CAM explainability to show which parts of each image the model used to make its prediction.
+IGTD + CNN + Grad-CAM for diabetes risk prediction. Uses Marzia’s dataset (`train_data.csv` + `test_data.csv` in the parent `Diabetes_Risk_XAI/` folder).
 
-## Contents
+## What it does
 
-- `run_pipeline.py` – Main script (IGTD → CNN → Grad-CAM)
-- `IGTD_Functions.py` – IGTD algorithm functions
-- `IGTD_Results/` – Created on run; IGTD optimization outputs
-- `IGTD_Images/` – Created on run; diabetic_X.png, non_diabetic_X.png
-- `GradCAM_Output/` – Created on run; gradcam_sample_1.png … gradcam_sample_8.png
-- `results_summary.csv` – Created on run; Accuracy, Precision, Recall, F1-Score
+- Loads the full dataset (train + test merged when both exist)
+- Runs IGTD → CNN → Grad-CAM
+- Saves **4 CSV files** (TP, TN, FP, FN) with **all samples** per category under `csv/`
+- Generates **4 images** (mean IGTD + mean Grad-CAM per category) under `output/images/`
+- **On each run:** clears old CSVs and images, then regenerates outputs
 
-## How to Run
+## How to run
+
+From the repo root:
 
 ```bash
-cd GRAD-CAM
-python run_pipeline.py
+cd Diabetes_Risk_XAI/GRAD-CAM
+python gradcam_pipeline.py
 ```
 
-## Behavior
+## Output layout
 
-- **Old images and data are removed** before each run: `IGTD_Results`, `IGTD_Images`, and `GradCAM_Output` are cleared.
-- **New images and data are generated** each time you run the script.
-- **Dataset:** New CDC (cdcNormalDiabeticFE1_20RFFSQ.csv) or UCI fallback, 500 samples, 15 features, 80:20 split.
-- **Pipeline:** IGTD → ENN (k=3) → CNN → Grad-CAM with feature names and color scales.
+```
+GRAD-CAM/
+├── csv/
+│   ├── TP.csv
+│   ├── TN.csv
+│   ├── FP.csv
+│   └── FN.csv
+├── output/
+│   └── images/
+│       ├── gradcam_TP.png
+│       ├── gradcam_TN.png
+│       ├── gradcam_FP.png
+│       └── gradcam_FN.png
+├── gradcam_pipeline.py
+├── IGTD_Functions.py
+├── IGTD_Results/      # created on run
+├── IGTD_Images/       # created on run
+├── GradCAM_Output/    # legacy / optional outputs from older runs
+├── results_summary.csv
+└── cnn_diabetes_model.pt
+```
 
-## Expected Results
+## Results (latest `results_summary.csv`)
 
-- Accuracy: ~0.84
-- Precision: ~0.38
-- Recall: ~0.50
-- F1-Score: ~0.43
+| Metric    | Value   |
+|----------|---------|
+| Accuracy | **0.83** |
+| Precision | **0.37** |
+| Recall   | **0.58** |
+| F1-Score | **0.45** |
+
+Values are from the same run as the committed `results_summary.csv` (single train/test split, stratified).
 
 ## Dependencies
 
 ```bash
-pip install torch pandas numpy scikit-learn scipy matplotlib ucimlrepo
+pip install torch pandas numpy scikit-learn scipy matplotlib ucimlrepo seaborn
 ```
 
-## GitHub
+## Related folders in this repo
 
-This folder is one of two folders in the repo:
-
-1. **IGTD/** – Old dataset, IGTD + CNN only
-2. **GRAD-CAM/** – New dataset, IGTD + CNN + Grad-CAM (this folder)
+See the parent [`../README.md`](../README.md) for **IGTD** (IGTD + CNN only) and **XAI-RF** (Random Forest + heatmap XAI).

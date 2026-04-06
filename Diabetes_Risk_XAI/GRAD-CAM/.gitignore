@@ -1,8 +1,2 @@
-# Output folders - regenerated on each run
-IGTD_Results/
-IGTD_Images/
-GradCAM_Output/
-
-# Model and results (optional - remove these lines if you want to track them)
-cnn_diabetes_model.pt
-results_summary.csv
+__pycache__/
+*.py[cod]

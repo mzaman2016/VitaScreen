@@ -37,9 +37,8 @@ python run_pipeline.py
 pip install torch pandas numpy scikit-learn scipy matplotlib ucimlrepo
 ```
 
-## GitHub
+## Related folders in this repo
 
-This folder is intended to be used as one of two folders in the repo:
-
-1. **IGTD/** – Old dataset, IGTD + CNN only (this folder)
-2. **Root or XAI folder** – New dataset, IGTD + CNN + Grad-CAM
+1. **IGTD/** – Old CDC-style pipeline, IGTD + CNN only (this folder)
+2. **GRAD-CAM/** – IGTD + CNN + Grad-CAM (Marzia dataset)
+3. **XAI-RF/** – Random Forest + heatmap explainability (Marzia dataset)

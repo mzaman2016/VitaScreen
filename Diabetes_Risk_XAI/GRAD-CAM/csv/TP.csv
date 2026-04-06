@@ -1,0 +1,4 @@
+test_index,true_label,pred_label,pred_prob,true_str,pred_str,HighBP,HighChol,CholCheck,BMI,Smoker,Stroke,HeartDiseaseorAttack,PhysActivity,Fruits,Veggies,HvyAlcoholConsump,AnyHealthcare,NoDocbcCost,GenHlth,MentHlth
+18,1,1,0.8656697273254395,Diabetic,Diabetic,1.0,1.0,1.0,38.0,1.0,0.0,0.0,0.0,1.0,1.0,0.0,1.0,0.0,3.0,0.0
+77,1,1,0.9444732069969177,Diabetic,Diabetic,1.0,1.0,1.0,39.0,0.0,0.0,0.0,1.0,1.0,1.0,0.0,1.0,0.0,4.0,0.0
+78,1,1,0.9113868474960327,Diabetic,Diabetic,1.0,1.0,1.0,40.0,1.0,0.0,0.0,0.0,1.0,1.0,0.0,1.0,0.0,3.0,0.0
